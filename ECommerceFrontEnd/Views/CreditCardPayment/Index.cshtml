@@ -1,0 +1,43 @@
+﻿@model ECommerceFrontEnd.Models.CreditCardInformationModel
+
+@{
+    ViewData["Title"] = "Credit Card Information";
+}
+
+@if (ViewBag.Error != null)
+{
+    <div class="container">
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    </div>
+}
+else if (ViewBag.SuccessMessage != null)
+{
+    <div class="container">
+        <div class="alert alert-success">
+            @ViewBag.SuccessMessage
+        </div>
+    </div>
+}
+<br />
+<br />
+@using (Html.BeginForm())
+{
+    <div class="container">
+        <div>
+            <p>Card Number</p>
+            @Html.EditorFor(model => model.PAN)
+        </div>
+        <div>
+            <p>CVV</p>
+            @Html.EditorFor(model => model.CVV)
+        </div>
+        <div>
+            <p>Expiration Date</p>
+            @Html.TextBoxFor(model=>model.ExpiryDate, new{Type = "date"})
+        </div>
+
+        <input value="Validate" type="submit" />
+    </div>
+}
