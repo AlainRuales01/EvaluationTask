@@ -28,4 +28,4 @@ Finally, in the "CreditCardPaymentController" class in the "ECommerceFrontEnd" p
 
  In my case I have to replace the value by "https://localhost:7105/"
  
- Following these isntructions, you can run both, frontend and backend
+ Following these instructions you can run both, frontend and backend
