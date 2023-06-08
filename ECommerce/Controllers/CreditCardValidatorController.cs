@@ -67,8 +67,11 @@ namespace ECommerceBackEnd.Controllers
             }
             catch (Exception ex)
             {
-                statusCode = 1;
-                responseMessage = ex.Message;
+                return new ResponseModel()
+                {
+                    ResponseMessage = ex.Message,
+                    StatusCode = 1
+                };
             }
 
             return new ResponseModel()
@@ -76,7 +79,6 @@ namespace ECommerceBackEnd.Controllers
                 ResponseMessage = responseMessage,
                 StatusCode = statusCode
             };
-
         }
 
 
