@@ -24,20 +24,21 @@ else if (ViewBag.SuccessMessage != null)
 <br />
 @using (Html.BeginForm())
 {
-    <div class="container">
-        <div>
-            <p>Card Number</p>
-            @Html.EditorFor(model => model.PAN)
-        </div>
-        <div>
-            <p>CVV</p>
-            @Html.EditorFor(model => model.CVV)
-        </div>
-        <div>
-            <p>Expiration Date</p>
-            @Html.TextBoxFor(model=>model.ExpiryDate, new{Type = "date"})
+    <div class="form-group">
+        <div class="form-group col-md-6">
+            <label>Card Number</label>
+            @Html.EditorFor(model => model.PAN, new { htmlAttributes = new { @class = "form-control, m-3" } })
         </div>
 
-        <input value="Validate" type="submit" />
+        <div class="form-group col-md-6">
+            <label>CVV</label>
+            @Html.EditorFor(model => model.CVV, new { htmlAttributes = new { @class = "form-control, m-3" } })
+        </div>
+        <div class ="form-group col-md-6">
+            <label>Expiration Date</label>
+            @Html.TextBoxFor(model=>model.ExpiryDate, new{ @class = "form-control, m-3",Type = "date"})
+        </div>
+
+        <input value="Validate" type="submit" class="btn btn-primary" />
     </div>
 }

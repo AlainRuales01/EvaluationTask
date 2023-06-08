@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ECommerceBackEnd.Models;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace ECommerceBackEnd.Controllers
 {
@@ -19,38 +21,49 @@ namespace ECommerceBackEnd.Controllers
             int statusCode = 0;
             string responseMessage = "The credit card is valid";
 
-            var validateCVV = 3;
-            string[] americanExpressStart = { "34", "37" };
+            var creditCardPan = creditCard.PAN;
+            var creditCardCvv = creditCard.CVV;
+            var creditCardExpiryDate = creditCard.ExpiryDate;
+
             try
             {
-                bool isCreditCardInvalid = DateTime.Compare(creditCard.ExpiryDate, ACTUAL_DATE) < 0;
-                if (isCreditCardInvalid)
+                if (!IsNumericValues(creditCardPan, creditCardCvv))
                 {
-                    statusCode = 1;
-                    responseMessage = "The credit card has expired";
+                    return new ResponseModel()
+                    {
+                        ResponseMessage = "Please, insert only numbers",
+                        StatusCode = 1
+                    };
                 }
 
-                var panStart = creditCard.PAN.Substring(0, 2);
-
-                if (americanExpressStart.Contains(panStart))
+                if (IsCreditCardExpired(creditCardExpiryDate))
                 {
-                    validateCVV = 4;
+                    return new ResponseModel()
+                    {
+                        ResponseMessage = "The credit card has expired",
+                        StatusCode = 1
+                    };
+
                 }
 
-                if (creditCard.CVV.Length != validateCVV)
+                if (!ValidatePanLength(creditCardPan))
                 {
-                    statusCode = 1;
-                    responseMessage = "The CVV is incorrect";
+                    return new ResponseModel()
+                    {
+                        ResponseMessage = "The PAN lenght is not valid",
+                        StatusCode = 1
+                    };
                 }
 
-                var creditCardPanLenght = creditCard.PAN.Length;
-                if (creditCardPanLenght != 16 && creditCardPanLenght != 19)
+                if (!ValidateCvvLenght(creditCardPan, creditCardCvv))
                 {
-                    statusCode = 1;
-                    responseMessage = "The PAN lenght is not valid";
+                    return new ResponseModel()
+                    {
+                        ResponseMessage = "The CVV is incorrect",
+                        StatusCode = 1
+                    };
                 }
 
-                
             }
             catch (Exception ex)
             {
@@ -64,9 +77,75 @@ namespace ECommerceBackEnd.Controllers
                 StatusCode = statusCode
             };
 
+        }
 
 
+        /// <summary>
+        /// Function to validate if a credit card has expired
+        /// </summary>
+        /// <param name="creditCardExpireDate"></param>
+        /// <returns></returns>
+        private bool IsCreditCardExpired(DateTime creditCardExpireDate) => DateTime.Compare(creditCardExpireDate, ACTUAL_DATE) < 0;
 
+        /// <summary>
+        /// Function to validate if a credit card belongs to American Express
+        /// </summary>
+        /// <param name="creditCardPan"></param>
+        /// <returns></returns>
+        private bool IsAmericanExpress(string creditCardPan)
+        {
+            string[] americanExpressStart = { "34", "37" };
+            var panStart = creditCardPan.Substring(0, 2);
+
+            return americanExpressStart.Contains(panStart);
+        }
+
+        /// <summary>
+        /// Function to validate CVV Lenght
+        /// </summary>
+        /// <param name="creditCardCvv"></param>
+        /// <returns></returns>
+        private bool ValidateCvvLenght(string creditCardPan, string creditCardCvv)
+        {
+            var validateCVV = 3;
+            if (IsAmericanExpress(creditCardPan))
+            {
+                validateCVV = 4;
+            }
+
+            if (creditCardCvv.Length != validateCVV)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Function to validate PAN Lenght
+        /// </summary>
+        /// <param name="creditCardPan"></param>
+        /// <returns></returns>
+        private bool ValidatePanLength(string creditCardPan)
+        {
+            var creditCardPanLenght = creditCardPan.Length;
+            if (creditCardPanLenght != 16 && creditCardPanLenght != 19)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool IsNumericValues(string creditCardPan, string creditCardCvv)
+        {
+            bool isPanNumeric = Regex.IsMatch(creditCardPan, @"^\d+$");
+            bool isCvvNumeric = Regex.IsMatch(creditCardCvv, @"^\d+$");
+
+            if (isPanNumeric && isCvvNumeric)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
